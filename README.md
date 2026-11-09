@@ -1,0 +1,67 @@
+# BB10 Blue LED Recovery
+
+简体中文 | [English](README.en.md)
+
+这个项目保存并记录了用于处理部分 BlackBerry 10 设备“重启后数据丢失、开机出现蓝灯”的历史修复工具 **BlackBerryFix**。当手机每次正常重启后又丢失应用、设置或文件时，可以先比对这里记录的症状和实测结果。
+
+**这是独立整理的修复记录，不是黑莓官方项目，也不是 VoLTE 激活工具。** 蓝灯并不一定代表同一种故障；工具报告成功也不等于数据持久性已经验证。
+
+## 这个问题是什么
+
+历史知识库文章 KB36747 描述过一种情况：部分 BB10 手机正常重启时清除数据，启动期间出现蓝色通知灯。我们的 Q10 在正常重启后反复丢失应用、设置及新写入的测试文件，且开机时出现蓝灯；完整重刷系统后问题仍然复现。
+
+本仓库保存修复工具、校验值和使用记录，方便遇到类似问题的人识别文件并进行谨慎验证。它无法恢复已经丢失的数据，也不能保证修复所有设备或所有蓝灯故障。
+
+## 文件下载
+
+| 文件 | 用途与状态 |
+| --- | --- |
+| [BlackBerryFix.exe](vendor/windows/BlackBerryFix.exe) | Windows 修复程序，已在下述 Q10 上运行；**无 Authenticode 数字签名**。 |
+| [BlackBerryFix.zip](vendor/windows/BlackBerryFix.zip) | Windows 原始压缩包，包含上面的程序。 |
+| [KB36747_BlackBerryFixMac.zip](vendor/mac/KB36747_BlackBerryFixMac.zip) | 历史 Mac 版本，**未在本项目测试**。其中程序是 32 位 x86；[macOS Catalina 10.15 及以后不支持 32 位应用](https://support.apple.com/en-us/103076)。 |
+
+下载 ZIP 时可在文件页面使用 GitHub 的下载按钮；也可以克隆整个仓库。程序的源代码和许可文件没有随这两份压缩包提供，详见[版权说明](#许可与版权)。
+
+## Windows 使用方法
+
+1. **先在电脑等手机之外的位置备份重要数据。** 修复过程可能导致数据丢失。给手机充足电，连接稳定的 USB 线，并确保电脑已经安装可识别设备的 BlackBerry USB 驱动。
+2. 只连接需要修复的手机，解锁后核对它的型号和设备 PIN。工具界面的 PIN 用于确认目标设备，不要把 PIN、密码或备份上传到公开讨论区。
+3. 下载并核对下面的 SHA-256，然后运行 `BlackBerryFix.exe`。这是无数字签名的历史程序：哈希匹配只能说明它与此处记录的文件相同，并不证明文件一定安全或适合你的设备。
+4. 在程序中确认显示的是目标手机的 PIN，再选择 **Fix this phone** 并等待结果。我们的设备第一次运行时，程序要求先关闭设备密码并重启程序；如果你看到相同提示，请在手机上按提示操作，修复后重新启用原有安全设置。
+5. 工具报告完成后，先新建一个无价值的测试文件或便签，再正常重启手机，检查蓝灯和测试文件是否留存。再新建一份并重启核对。**如果数据仍会丢失，就不要把这次修复视为通过**，请保留外部备份并继续排查。
+
+这是一次涉及设备数据的操作。请始终依据程序实际提示和自己的备份情况决定是否继续；不要对其他已连接设备操作。
+
+## 实测范围
+
+2026-11-09（UTC），我们对 **BlackBerry Q10 SQN100-3，BB10 10.3.3.3216** 使用了 Windows 版：
+
+- 修复程序显示 `Fixed`。修复后第一次重启已无蓝灯，但两份先前写入的测试标记仍然消失。
+- 随后新建的两份测试标记在第二次正常重启后均原样保留，蓝灯未再出现。之后重新安装的应用、后台和手机端备份也在另一次重启后留存。
+- 这是单台设备、有限次数的结果。首次重启的数据丢失和长期稳定性都不能忽略；其他型号、系统版本和 Mac 工具尚未在本项目验证。
+
+## 文件完整性
+
+```text
+8dab7e156cf63062890e2eceda478d10de96d4918443422a7ee2740e860632a0  vendor/windows/BlackBerryFix.exe
+74321fc83a8680a0a44ba6b842d1dc8883850b968414700b435dc2d93e3b8d67  vendor/windows/BlackBerryFix.zip
+201f1338e86980d5b5cbd318b750fad387cbc0cdd2e08eaacf4a9a5c9eba742c  vendor/mac/KB36747_BlackBerryFixMac.zip
+```
+
+安装 Python 3 后，在仓库根目录运行：
+
+```powershell
+python tools/verify.py
+```
+
+校验脚本只读取文件，不运行修复程序、不连接手机；它还检查两个 ZIP 中的文件哈希和 CRC。Windows 也可以单独运行：
+
+```powershell
+Get-FileHash -Algorithm SHA256 .\vendor\windows\BlackBerryFix.exe
+```
+
+两份 ZIP 的哈希与已记录的历史文件一致：[Windows 文件记录](https://www.herdprotect.com/blackberryfix.zip-a733a48e28919fbb3f507e4f9e08fec3fb026d15.aspx)、[Mac 文件记录](https://www.herdprotect.com/kb36747_blackberryfixmac.zip-a316817eac09a7fbc2eaf9a107bc77532ed048f4.aspx)。这些记录不能替代厂商数字签名或安全审计。历史黑莓知识库编号为 [KB36747](https://www.blackberry.com/btsc/KB36747)；旧链接可能已失效。
+
+## 许可与版权
+
+本项目原创的说明文档和校验脚本使用 [MIT 许可证](LICENSE)。`vendor/` 中的 BlackBerryFix 程序和压缩包为第三方历史文件，**不适用该 MIT 许可证**；原程序源代码和许可条款未随包提供，其再分发许可尚未核实。相关权利归各自权利人所有，详见 [NOTICE.md](NOTICE.md)。
