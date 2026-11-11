@@ -8,7 +8,7 @@ This project preserves and documents **BlackBerryFix**, a historical utility for
 
 ## The problem
 
-The historical BlackBerry knowledge-base article KB36747 described devices deleting data on manual restart and displaying a blue LED while booting. Our Q10 repeatedly lost applications, settings, and newly written test files after normal restarts, with a blue light during boot. The issue remained after a full OS reflash.
+The historical BlackBerry knowledge-base article KB36747 described devices deleting data on manual restart and displaying a blue LED while booting. Both of our Q10 units lost applications, settings or newly written test files after normal restarts, with a blue LED during boot; on one unit the issue remained after a full OS reflash.
 
 This project cannot restore data already lost or guarantee a fix for every device or blue-LED problem.
 
@@ -34,11 +34,24 @@ This operation affects device data. Follow the utility's actual prompts, take yo
 
 ## Observed result
 
-On 2026-11-09 (UTC) we used the Windows utility on one **BlackBerry Q10 SQN100-3 running BB10 10.3.3.3216**:
+**2026-11-09 (UTC), BlackBerry Q10 SQN100-3, BB10 10.3.3.3216:**
 
 - The utility reported `Fixed`. The first restart had no blue LED, but both previously written test markers were still missing.
 - Two newly created markers survived the second normal restart unchanged, again without a blue LED. A subsequently reinstalled app, backend, and phone-side backup also survived another restart.
-- This is a single-device, limited-reboot observation. The first post-fix data loss and unknown long-term reliability remain material. Other models, OS versions, and the Mac utility have not been validated by this project.
+
+**2026-11-11 (UTC), a second BlackBerry Q10 SQN100-3, originally running 10.3.1.2243:**
+
+- The owner first had the phone wiped and fully flashed to stock 10.3.3.3216. After installing the app, one normal restart removed the app and its data and the phone showed a blue LED throughout boot; Root and the system partitions were unaffected. The same Windows utility was then used after checking its SHA-256 and matching the PIN shown by the tool to the target device; it reported `Fixed`.
+- The first restart after the repair showed no blue LED. Two markers written and fsynced after that restart survived the second restart intact.
+- The reinstalled app survived a third restart. After the owner activated the backend inside the app, a fourth restart started the backend from the boot hook and it reached IMS connected / 200 OK.
+
+Across both units: multiple normal restarts after the repair (four on the second unit) showed no blue LED, and markers, the app, the backend and the boot hook all persisted. This is still a limited-device, limited-reboot observation; the first unit lost markers on its first post-fix restart, and long-term reliability is not guaranteed.
+
+## Possible cause (unverified hypothesis)
+
+Based on these two units, the owner's hypothesis is that this may be a **BB10 OS problem** triggered when a phone is upgraded or fully flashed directly from an older OS (such as 10.3.1.2243 on this unit) to 10.3.3.3216, rather than something caused by the VoLTE activation tooling.
+
+This is only a guess and is not proven; it also does not explain everything: the 2026-11-09 unit was already on 10.3.3.3216 when the problem appeared, and a full reflash of the same version did not fix it. So “upgrading from an old version to 3216” should not be treated as the sole cause or an inevitable result. If you see the same symptoms, back up first and independently verify with your own test files that data really survives restarts.
 
 ## File integrity
 
